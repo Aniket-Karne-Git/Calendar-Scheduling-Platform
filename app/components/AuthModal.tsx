@@ -28,8 +28,6 @@ export function AuthModal() {
             Cal<span className="text-primary">Marshal</span>
           </h4>
         </DialogHeader>
-
-        {/* Add DialogTitle here */}
         <DialogTitle className="sr-only">Sign In</DialogTitle>
 
         <div className="flex flex-col gap-3 mt-5">
