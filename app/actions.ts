@@ -3,7 +3,7 @@
 import { parseWithZod } from "@conform-to/zod";
 import prisma from "./lib/db";
 import { requireUser } from "./lib/hooks";
-import { onboardingSchema } from "./lib/ZodSchemas";
+import { aboutSettingsSchema, onboardingSchema } from "./lib/ZodSchemas";
 import { redirect } from "next/navigation";
 
 // import { parseWithZod } from "@conform-to/zod";
@@ -96,29 +96,29 @@ export async function onboardingAction(prevState: any, formData: FormData) {
   return redirect("/onboarding/grant-id");
 }
 
-// export async function SettingsAction(prevState: any, formData: FormData) {
-//   const session = await requireUser();
+export async function SettingsAction(prevState: any, formData: FormData) {
+  const session = await requireUser();
 
-//   const submission = parseWithZod(formData, {
-//     schema: aboutSettingsSchema,
-//   });
+  const submission = parseWithZod(formData, {
+    schema: aboutSettingsSchema,
+  });
 
-//   if (submission.status !== "success") {
-//     return submission.reply();
-//   }
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
 
-//   const user = await prisma.user.update({
-//     where: {
-//       id: session.user?.id as string,
-//     },
-//     data: {
-//       name: submission.value.fullName,
-//       image: submission.value.profileImage,
-//     },
-//   });
+  const user = await prisma.user.update({
+    where: {
+      id: session.user?.id as string,
+    },
+    data: {
+      name: submission.value.fullName,
+    //   image: submission.value.profileImage,
+    },
+  });
 
-//   return redirect("/dashboard");
-// }
+  return redirect("/dashboard");
+}
 
 // export async function CreateEventTypeAction(
 //   prevState: any,
