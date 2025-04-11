@@ -5,6 +5,7 @@ import prisma from "./lib/db";
 import { requireUser } from "./lib/hooks";
 import { aboutSettingsSchema, onboardingSchema } from "./lib/ZodSchemas";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 // import { parseWithZod } from "@conform-to/zod";
 // import prisma from "./lib/db";
@@ -49,47 +50,47 @@ export async function onboardingAction(prevState: any, formData: FormData) {
     data: {
       username: submission.value.username,
       name: submission.value.fullName,
-      //   Availability: {
-      //     createMany: {
-      //       data: [
-      //         {
-      //           day: "Monday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Tuesday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Wednesday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Thursday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Friday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Saturday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //         {
-      //           day: "Sunday",
-      //           fromTime: "08:00",
-      //           tillTime: "18:00",
-      //         },
-      //       ],
-      //     },
-      //   },
+      Availability: {
+        createMany: {
+          data: [
+            {
+              day: "Monday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Tuesday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Wednesday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Thursday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Friday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Saturday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+            {
+              day: "Sunday",
+              fromTime: "08:00",
+              tillTime: "18:00",
+            },
+          ],
+        },
+      },
     },
   });
 
@@ -113,7 +114,7 @@ export async function SettingsAction(prevState: any, formData: FormData) {
     },
     data: {
       name: submission.value.fullName,
-    //   image: submission.value.profileImage,
+      //   image: submission.value.profileImage,
     },
   });
 
@@ -248,43 +249,43 @@ export async function SettingsAction(prevState: any, formData: FormData) {
 //   }
 // }
 
-// export async function updateAvailabilityAction(formData: FormData) {
-//   const session = await requireUser();
+export async function updateAvailabilityAction(formData: FormData) {
+  const session = await requireUser();
 
-//   const rawData = Object.fromEntries(formData.entries());
-//   const availabilityData = Object.keys(rawData)
-//     .filter((key) => key.startsWith("id-"))
-//     .map((key) => {
-//       const id = key.replace("id-", "");
-//       return {
-//         id,
-//         isActive: rawData[`isActive-${id}`] === "on",
-//         fromTime: rawData[`fromTime-${id}`] as string,
-//         tillTime: rawData[`tillTime-${id}`] as string,
-//       };
-//     });
+  const rawData = Object.fromEntries(formData.entries());
+  const availabilityData = Object.keys(rawData)
+    .filter((key) => key.startsWith("id-"))
+    .map((key) => {
+      const id = key.replace("id-", "");
+      return {
+        id,
+        isActive: rawData[`isActive-${id}`] === "on",
+        fromTime: rawData[`fromTime-${id}`] as string,
+        tillTime: rawData[`tillTime-${id}`] as string,
+      };
+    });
 
-//   try {
-//     await prisma.$transaction(
-//       availabilityData.map((item) =>
-//         prisma.availability.update({
-//           where: { id: item.id },
-//           data: {
-//             isActive: item.isActive,
-//             fromTime: item.fromTime,
-//             tillTime: item.tillTime,
-//           },
-//         })
-//       )
-//     );
+  try {
+    await prisma.$transaction(
+      availabilityData.map((item) =>
+        prisma.availability.update({
+          where: { id: item.id },
+          data: {
+            isActive: item.isActive,
+            fromTime: item.fromTime,
+            tillTime: item.tillTime,
+          },
+        })
+      )
+    );
 
-//     revalidatePath("/dashboard/availability");
-//     return { status: "success", message: "Availability updated successfully" };
-//   } catch (error) {
-//     console.error("Error updating availability:", error);
-//     return { status: "error", message: "Failed to update availability" };
-//   }
-// }
+    revalidatePath("/dashboard/availability");
+    return { status: "success", message: "Availability updated successfully" };
+  } catch (error) {
+    console.error("Error updating availability:", error);
+    return { status: "error", message: "Failed to update availability" };
+  }
+}
 
 // export async function createMeetingAction(formData: FormData) {
 //   const getUserData = await prisma.user.findUnique({
