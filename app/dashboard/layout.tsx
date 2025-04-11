@@ -23,11 +23,35 @@ import { auth, signOut } from "../lib/auth";
 import { ThemeToggle } from "./ThemeToggle";
 import { DialogTitle } from "@/components/ui/dialog";
 
+async function getData(id: string) {
+  const data = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      username: true,
+      grantId: true,
+    },
+  });
+
+  if (!data?.username) {
+    return redirect("/onboarding");
+  }
+
+  if (!data.grantId) {
+    return redirect("/onboarding/grant-id");
+  }
+
+  return data;
+}
+
 export default async function Dashboard({ children }: { children: ReactNode }) {
   const session = await auth();
 
+  const data = await getData(session?.user?.id as string);
+
   if (!session?.user) {
-    return redirect("/");
+    return redirect("/onboarding");
   }
 
   return (
